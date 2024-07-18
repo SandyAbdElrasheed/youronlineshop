@@ -1,0 +1,32 @@
+name: Build Node.js App for onlineshopping
+
+on:
+  push:
+    branches:
+      - onlineshopping
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: sudo npm install
+      
+   
+      - name: permission adjust 
+        run: sudo chmod 600 TeraKey.pem
+
+      - name: copy files to server 
+        run: scp -o StrictHostKeyChecking=no -i TeraKey.pem -r * ec2-user@3.236.185.104:/home/ec2-user/
+
+      - name: Trigger depl script
+        run: ssh -o StrictHostKeyChecking=no -i TeraKey.pem  ec2-user@3.236.185.104 nohup /home/ec2-user/node.sh &
